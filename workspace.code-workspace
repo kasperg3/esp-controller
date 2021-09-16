@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "esp-controller",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.ipp": "cpp",
+			"functional": "cpp"
+		}
+	}
+}
