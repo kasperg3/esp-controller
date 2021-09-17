@@ -18,9 +18,15 @@
 // TODO Improvements
 // Add self test
 // add calibration
-
+// This implementatioin should include setting operation mode and interrupt functionality of the BMX055
+// TODO optimize memory usage of this class. unnecessary arrays are getting initialized and not deleted
 class BMX055Driver {
     EspI2CMaster *i2c;
+    void sampleAccData(int *result);
+
+    void sampleGyroData(int *result);
+
+    void sampleMagData(int *result);
 
     void sampleData(int *result, uint8_t addr, char dataReg, uint8_t dataLength);
 
@@ -34,10 +40,6 @@ class BMX055Driver {
     void getGyro(double *);
 
     void getMag(double *);
-
-    void sampleAccData(int *result, uint8_t addr, char dataReg);
-
-    void sampleGyroData(int *result, uint8_t addr, char dataReg);
 };
 
 #endif  //MYRL_BMX055DRIVER_H

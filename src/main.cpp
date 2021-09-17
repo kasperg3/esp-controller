@@ -16,6 +16,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
+#include "peripherals/Display/EspOledDriver.h"
 #include "peripherals/GPIO/EspGPIO.h"
 #include "peripherals/Sensor/Bmx055Driver.h"
 #include "peripherals/Serial/EspI2CMaster.h"
@@ -52,18 +53,30 @@ void i2cTest() {
     EspI2CMaster i2cMaster = EspI2CMaster();
     ESP_LOGI(TAG, "Starting IMU Driver...");
     BMX055Driver imu = BMX055Driver(&i2cMaster);
-    double result[3] = {0, 0, 0};
+    double accData[3] = {0};
+    double gyrData[3] = {0};
+    //double magData[4] = {0};
     while (true) {
-        vTaskDelay(100);
-        imu.getAcc(result);
-        double accX = result[0];
-        double accY = result[1];
-        double accZ = result[2];
+        vTaskDelay(10);
+        imu.getAcc(accData);
+        ESP_LOGI(TAG, "ACCELEROMETER: x: %f , y: %f , z: %f  ", accData[0], accData[1], accData[2]);
+        memset(accData, 0, sizeof(accData));
 
-        ESP_LOGI(TAG, "Acc value x: %f ", accX);
-        ESP_LOGI(TAG, "Acc value y: %f ", accY);
-        ESP_LOGI(TAG, "Acc value z: %f ", accZ);
+        vTaskDelay(10);
+        imu.getGyro(gyrData);
+        ESP_LOGI(TAG, "GYROMETER: x: %f , y: %f , z: %f  ", gyrData[0], gyrData[1], gyrData[2]);
+        memset(gyrData, 0, sizeof(gyrData));
+
+        //vTaskDelay(10);
+        //imu.getMag(magData);
+        //ESP_LOGI(TAG, "MAGNETOMETER: x: %f , y: %f , z: %f , h: %f ", magData[0], magData[1], magData[2], magData[3]);
+        //memset(magData, 0, sizeof(magData));
     }
+}
+
+void writeToOled(void) {
+    EspI2CMaster i2cMaster = EspI2CMaster();
+    EspOledDriver oled = EspOledDriver(&i2cMaster);
 }
 
 void app_main(void) {
@@ -71,7 +84,9 @@ void app_main(void) {
     // schedule gpio task
     //xTaskCreate(gpioTest, "Toggle LED", 4096, NULL, 1, NULL);
     // run the i2c task
-    i2cTest();
+    //i2cTest();
+
+    writeToOled();
     while (true) {
         vTaskDelay(10);
     }
