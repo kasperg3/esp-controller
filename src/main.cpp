@@ -55,7 +55,7 @@ void i2cTest() {
     BMX055Driver imu = BMX055Driver(&i2cMaster);
     double accData[3] = {0};
     double gyrData[3] = {0};
-    //double magData[4] = {0};
+    // double magData[4] = {0};
     while (true) {
         vTaskDelay(10);
         imu.getAcc(accData);
@@ -67,10 +67,10 @@ void i2cTest() {
         ESP_LOGI(TAG, "GYROMETER: x: %f , y: %f , z: %f  ", gyrData[0], gyrData[1], gyrData[2]);
         memset(gyrData, 0, sizeof(gyrData));
 
-        //vTaskDelay(10);
-        //imu.getMag(magData);
-        //ESP_LOGI(TAG, "MAGNETOMETER: x: %f , y: %f , z: %f , h: %f ", magData[0], magData[1], magData[2], magData[3]);
-        //memset(magData, 0, sizeof(magData));
+        // vTaskDelay(10);
+        // imu.getMag(magData);
+        // ESP_LOGI(TAG, "MAGNETOMETER: x: %f , y: %f , z: %f , h: %f ", magData[0], magData[1], magData[2], magData[3]);
+        // memset(magData, 0, sizeof(magData));
     }
 }
 
@@ -79,14 +79,36 @@ void writeToOled(void) {
     EspOledDriver oled = EspOledDriver(&i2cMaster);
 }
 
-void app_main(void) {
-    //wifi_example();
-    // schedule gpio task
-    //xTaskCreate(gpioTest, "Toggle LED", 4096, NULL, 1, NULL);
-    // run the i2c task
-    //i2cTest();
+#include "lcdgfx.h"
 
-    writeToOled();
+void app_main(void) {
+    int progress = 0;
+    DisplaySSD1306_128x64_I2C display(-1);
+
+    //  setup
+    display.begin();
+    display.setFixedFont(ssd1306xled_font6x8);
+    display.clear();
+    display.drawWindow(0, 0, 0, 0, "Downloading", true);
+
+    // draw
+    while (true) {
+        display.drawProgressBar(progress);
+        progress++;
+        if (progress > 100) {
+            progress = 0;
+            vTaskDelay(2000);
+        } else {
+            vTaskDelay(50);
+        }
+    }
+    // wifi_example();
+    //  schedule gpio task
+    // xTaskCreate(gpioTest, "Toggle LED", 4096, NULL, 1, NULL);
+    //  run the i2c task
+    // i2cTest();
+
+    // writeToOled();
     while (true) {
         vTaskDelay(10);
     }

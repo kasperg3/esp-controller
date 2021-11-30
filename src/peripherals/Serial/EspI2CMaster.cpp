@@ -3,8 +3,8 @@
 
 /*!< I2CMaster nack value */
 
-//TODO: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html
-// https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c
+// TODO: https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/i2c.html
+//  https://github.com/espressif/esp-idf/blob/master/examples/peripherals/i2c/i2c_self_test/main/i2c_example_main.c
 #define I2C_MASTER_SCL GPIO_NUM_22
 #define I2C_MASTER_SDA GPIO_NUM_21
 #define I2C_MASTER_PORT_NUM 1

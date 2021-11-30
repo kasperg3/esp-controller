@@ -6,40 +6,34 @@
 EspOledDriver::EspOledDriver(EspI2CMaster *serial) {
     i2c = serial;
 
-    writeCmd(0xAE);  //Turn the OLED panel display OFF.
-    writeCmd(0x20);  //Set Memory Addressing Mode as
-    writeCmd(0x00);  //Horizontal Addressing Mode
-    writeCmd(0xB0);  //Page Start Address for Page Addressing Mode
-    writeCmd(0xC8);  //COM Output Scan Direction as normal
-    writeCmd(0x00);  //Lower Column Start Address for Page Addressing Mode
-    writeCmd(0x10);  //Higher Column Start Address for Page Addressing Mode
-    writeCmd(0x40);  //Display Start Line 0 - 63
-    writeCmd(0x81);  //Contrast Control
-    writeCmd(0xFF);  //256
-    writeCmd(0xA1);  //Segment Re-map - column address 127 is mapped to SEG0
-    writeCmd(0xA6);  //Normal display
-    writeCmd(0xA8);  //Multiplex Ratio
+    writeCmd(0xAE);  // Turn the OLED panel display OFF.
+    writeCmd(0x20);  // Set Memory Addressing Mode as
+    writeCmd(0x00);  // Horizontal Addressing Mode
+    writeCmd(0xB0);  // Page Start Address for Page Addressing Mode
+    writeCmd(0xC8);  // COM Output Scan Direction as normal
+    writeCmd(0x00);  // Lower Column Start Address for Page Addressing Mode
+    writeCmd(0x10);  // Higher Column Start Address for Page Addressing Mode
+    writeCmd(0x40);  // Display Start Line 0 - 63
+    writeCmd(0x81);  // Contrast Control
+    writeCmd(0xFF);  // 256
+    writeCmd(0xA1);  // Segment Re-map - column address 127 is mapped to SEG0
+    writeCmd(0xA6);  // Normal display
+    writeCmd(0xA8);  // Multiplex Ratio
     writeCmd(0x3F);  // 64MUX
-    writeCmd(0xA4);  //Entire Display ON - Resume to RAM content display
-    writeCmd(0xD3);  //Display Offset
-    writeCmd(0x00);  //Set vertical shift by COM from 0d~63d
-    writeCmd(0xD5);  //Display Clock Divide Ratio/Oscillator Frequency
+    writeCmd(0xA4);  // Entire Display ON - Resume to RAM content display
+    writeCmd(0xD3);  // Display Offset
+    writeCmd(0x00);  // Set vertical shift by COM from 0d~63d
+    writeCmd(0xD5);  // Display Clock Divide Ratio/Oscillator Frequency
     writeCmd(0xF0);
-    writeCmd(0xD9);  //Pre-charge Period
+    writeCmd(0xD9);  // Pre-charge Period
     writeCmd(0x22);
-    writeCmd(0xDA);  //COM Pins Hardware Configuration
-    writeCmd(0x12);  //Alternative
-    writeCmd(0xDB);  //VCOMH Deselect Level
-    writeCmd(0x20);  //0.77 x VCC
-    writeCmd(0x8D);  //Charge Pump Setting
-    writeCmd(0x14);  //Enable charge pump during display on
-    writeCmd(0xAF);  //Turn the OLED panel display ON.
-
-    char *str = "This is wierd";
-    uint8_t column = 0, page = 0;
-    writeCmd(0xB0 + page++);
-    writeCmd(0x00);
-    writeCmd(0x10);
+    writeCmd(0xDA);  // COM Pins Hardware Configuration
+    writeCmd(0x12);  // Alternative
+    writeCmd(0xDB);  // VCOMH Deselect Level
+    writeCmd(0x20);  // 0.77 x VCC
+    writeCmd(0x8D);  // Charge Pump Setting
+    writeCmd(0x14);  // Enable charge pump during display on
+    writeCmd(0xAF);  // Turn the OLED panel display ON.
 
     uint8_t font8x8[128][8] = {
         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},  // U+0000 (nul)
@@ -174,31 +168,17 @@ EspOledDriver::EspOledDriver(EspI2CMaster *serial) {
 
     // Clear screen
     uint8_t arr[1024];
-
-    for (int i = 0; i < 1024; i++) {
-        arr[i] = 0x00;
-    }
-
+    memset(&arr, 0, 1024);
     for (int page = 0; page < 8; page++) {
         writeCmd(0xB0 + page);
         writeCmd(0x00);
         writeCmd(0x10);
         writeData(&arr[128 * page], 128);
     }
-
+    char *str = "Annamis er dejlig!";
     // Send string
-
     for (uint8_t index = 0; index < strlen(str); index++) {
-        if (column == 16 || (str[index] == '\n' && page != 0)) {
-            writeCmd(0xB0 + page++);
-            writeCmd(0x00);
-            writeCmd(0x10);
-            column = 0;
-        }
-        if (column < 16 && str[index] != '\n') {
-            writeData(font8x8[(uint8_t)str[index]], 8);
-            column++;
-        }
+        writeData(font8x8[(uint8_t)str[index]], 8);
     }
 }
 
