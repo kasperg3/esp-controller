@@ -53,10 +53,9 @@ BMX055Driver::BMX055Driver(EspI2CMaster *serial) {
     
     // Bias correction of gyro
     double gyroData[3] = {};
-    int n_samples = 100;
+    int n_samples = 1000;
     for (size_t i = 0; i < n_samples; i++)
     {
-        vTaskDelay(1);
         getGyro(gyroData);
         gyroBiasCorrection[0] += gyroData[0];
         gyroBiasCorrection[1] += gyroData[1];
@@ -157,9 +156,6 @@ void BMX055Driver::getAccAngle(double *result){
     result[1] = atan2(data[0],sqrt(pow(data[1],2) + pow(data[2],2))); 
     // Roll
     result[2] = atan2(sqrt(pow(data[0],2) + pow(data[1],2)),data[2]); 
-
-
-
 }
 
 

@@ -1,22 +1,6 @@
-/* WiFi softAP Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <string.h>
-
-#include "esp_event.h"
 #include "esp_log.h"
-#include "esp_spiffs.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
-#include "freertos/task.h"
-#include "peripherals/Display/EspOledDriver.h"
 #include "peripherals/GPIO/EspGPIO.h"
 #include "peripherals/Sensor/Bmx055Driver.h"
 #include "peripherals/Serial/EspI2CMaster.h"
@@ -57,57 +41,22 @@ void i2cTest() {
     double accData[3] = {0};
     double gyrData[3] = {0};
     
-    int progress = 0;
-
     while (true) {
-        progress += 1;
         imu.getAccAngle(accData);
-
         imu.getGyroRelativeAngle(gyrData);
         ESP_LOGI(TAG, "GYROMETER: x: %f , y: %f , z: %f  ", gyrData[0] * 180 / PI, gyrData[1]* 180 / PI, gyrData[2]* 180 / PI);
         ESP_LOGI(TAG, "ACCELEROMETER: x: %f , y: %f , z: %f  ", accData[0]*180/PI, accData[1]*180/PI, accData[2]*180/PI);
-
         vTaskDelay(10);
     }
 }
 
-void writeToOled(void) {
-    EspI2CMaster i2cMaster = EspI2CMaster();
-    EspOledDriver oled = EspOledDriver(&i2cMaster);
-}
+// # Work in progress 
+// * Github build check
+// * Filters(kalman) for IMU driver
+// * data logging/plotting remote
+// * iot
 
-// #include "lcdgfx.h"
 
 void app_main(void) {
     i2cTest();
-    // DisplaySSD1306_128x64_I2C display(-1);
-
-    //  setup
-    // display.begin();
-    // display.setFixedFont(ssd1306xled_font6x8);
-    // display.clear();
-    // display.drawWindow(0, 0, 0, 0, "Downloading", true);
-
-    // draw
-    // while (true) {
-        
-    //     // display.drawProgressBar(progress);
-    //     progress++;
-    //     if (progress > 100) {
-    //         progress = 0;
-    //         vTaskDelay(2000);
-    //     } else {
-    //         vTaskDelay(50);
-    //     }
-    // }
-    // wifi_example();
-    //  schedule gpio task
-    // xTaskCreate(gpioTest, "Toggle LED", 4096, NULL, 1, NULL);
-    //  run the i2c task
-    // i2cTest();
-
-    // writeToOled();
-    while (true) {
-        vTaskDelay(10);
-    }
 }
