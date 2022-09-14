@@ -22,6 +22,9 @@
 // TODO optimize memory usage of this class. unnecessary arrays are getting initialized and not deleted
 class BMX055Driver {
     EspI2CMaster *i2c;
+    double gyroBiasCorrection[3] = {0};
+    double gyroRelative[3] = {0};
+    
     void sampleAccData(int *result);
 
     void sampleGyroData(int *result);
@@ -37,9 +40,14 @@ class BMX055Driver {
 
     void getAcc(double *);
 
+    void getAccAngle(double *);
+
     void getGyro(double *);
 
+    void getGyroRelativeAngle(double *);
+
     void getMag(double *);
+
 };
 
 #endif  //MYRL_BMX055DRIVER_H

@@ -92,7 +92,7 @@ void EspI2CMaster::showBuf(uint8_t* buf, int len) {
     int i;
 
     for (i = 0; i < len; i++) {
-        ESP_LOGI("I2CMaster", "value: %x", buf[i]);
+        // ESP_LOGI("I2CMaster", "value: %x", buf[i]);
         if ((i + 1) % 16 == 0) {
             printf("\n");
         }

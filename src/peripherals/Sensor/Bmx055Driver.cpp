@@ -9,6 +9,9 @@
 #include <iostream>
 #include <ostream>
 
+#include <math.h>
+
+
 // #########################################################################
 // #                           PinSetup                                    #
 // #########################################################################
@@ -46,6 +49,23 @@ BMX055Driver::BMX055Driver(EspI2CMaster *serial) {
     // #########################################################################
     //buf[0] = {0x00};
     //i2c->writeRegister(buf, ADDR_MAGNET, 0x4C, 2);
+
+    
+    // Bias correction of gyro
+    double gyroData[3] = {};
+    int n_samples = 100;
+    for (size_t i = 0; i < n_samples; i++)
+    {
+        vTaskDelay(1);
+        getGyro(gyroData);
+        gyroBiasCorrection[0] += gyroData[0];
+        gyroBiasCorrection[1] += gyroData[1];
+        gyroBiasCorrection[2] += gyroData[2];
+    }
+    gyroBiasCorrection[0] = gyroBiasCorrection[0] / n_samples;
+    gyroBiasCorrection[1] = gyroBiasCorrection[1] / n_samples;
+    gyroBiasCorrection[2] = gyroBiasCorrection[2] / n_samples;
+
 }
 
 // bit composition
@@ -101,11 +121,22 @@ void BMX055Driver::getGyro(double *result) {
     for (int i = 0; i < 3; i++) {
         // The data is 16 bit two complement (32768 is max integer)
         // The gyro outputs +-250*/s
-        result[i] = ((double)data[i] / 32768) * 250;
+        result[i] = ((double)data[i] / 32768) / 2;
     }
+}   
+void BMX055Driver::getGyroRelativeAngle(double *result){
+    double data[3] = {0,0,0};
+    getGyro(data);
+    gyroRelative[0] += data[0] - gyroBiasCorrection[0];
+    gyroRelative[1] += data[1] - gyroBiasCorrection[1];
+    gyroRelative[2] += data[2] - gyroBiasCorrection[2];
+    result[0] = gyroRelative[0];
+    result[1] = gyroRelative[1];
+    result[2] = gyroRelative[2];
 }
 
 void BMX055Driver::getMag(double *result) {
+    // TODO make this work
     int data[3] = {0, 0, 0};
     sampleMagData(data);
     // The Magnetometer outputs 13 bits twos complement
@@ -114,6 +145,23 @@ void BMX055Driver::getMag(double *result) {
     result[2] = ((double)data[2] / 16384);
     result[3] = ((double)data[3] / 8192);
 }
+
+void BMX055Driver::getAccAngle(double *result){
+    // Calculate the Pitch yaw roll
+    // https://www.analog.com/en/app-notes/an-1057.html
+    double data[3] = {0, 0, 0};
+    getAcc(data);
+    // Pitch
+    result[0] = atan2(data[1],sqrt(pow(data[0],2) + pow(data[2],2))); 
+    // Yaw
+    result[1] = atan2(data[0],sqrt(pow(data[1],2) + pow(data[2],2))); 
+    // Roll
+    result[2] = atan2(sqrt(pow(data[0],2) + pow(data[1],2)),data[2]); 
+
+
+
+}
+
 
 BMX055Driver::~BMX055Driver() {
 }
